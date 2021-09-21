@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <launch>
 
+    <node pkg="rosbag" type="play" name="rosbag_play" args="--clock $(env HOME)/Downloads/2011_09_30_0018.bag"/> 
+
     <!--- Sim Time -->
     <param name="/use_sim_time" value="true" />
     <param name="scan_period" value="0.1" />
@@ -10,46 +12,29 @@
     <param name="vertical_angle" type="double" value="2.0" />
     <param name="max_dis" type="double" value="90.0" />
     <param name="min_dis" type="double" value="3.0" />
-
-    <node pkg="iscloam" type="iscloam_odom_estimation_node" name="iscloam_odom_estimation_node" output="screen">
-      <remap from="/velodyne_points_filtered" to="/lidar_points_filtered" />
-    </node>
-
-    <node pkg="iscloam" type="iscloam_laser_processing_node" name="iscloam_laser_processing_node" output="screen">
-      <remap from="/velodyne_points" to="/os_cloud_node/points" />
-      <remap from="/velodyne_points_filtered" to="/lidar_points_filtered" />
-    </node>
-
-    <node pkg="iscloam" type="iscloam_isc_generation_node" name="iscloam_isc_generation_node" output="screen">
-      <remap from="/velodyne_points_filtered" to="/lidar_points_filtered" />
-    </node>
+    <!--- -->
+    <node pkg="iscloam" type="iscloam_odom_estimation_node" name="iscloam_odom_estimation_node" output="screen"/>
+    <node pkg="iscloam" type="iscloam_laser_processing_node" name="iscloam_laser_processing_node" output="screen"/>
+    <node pkg="iscloam" type="iscloam_isc_generation_node" name="iscloam_isc_generation_node" output="screen"/>
     <node pkg="iscloam" type="iscloam_isc_optimization_node" name="iscloam_isc_optimization_node" output="screen"/>
+    <node pkg="iscloam" type="iscloam_laser_mapping_node" name="iscloam_laser_mapping_node" output="screen"/>
 
-    <node pkg="iscloam" type="iscloam_laser_mapping_node" name="iscloam_laser_mapping_node" output="screen">
-      <remap from="/velodyne_points_filtered" to="/lidar_points_filtered" />
-    </node>
+    <node pkg="tf" type="static_transform_publisher" name="word2map_tf"  args="0 0 0 0 0 0 /world /map 10" />
 
-     <node pkg="tf" type="static_transform_publisher" name="word2map_tf"  args="0 0 0 0 0 0 /world /map 100" />
-
-     <!---  <arg name="rviz" default="true" />
+    <arg name="rviz" default="true" />
     <group if="$(arg rviz)">
         <node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz" args="-d $(find iscloam)/rviz/iscloam_mapping.rviz" />
-    </group> 
+    </group>
 
-     <node pkg="hector_trajectory_server" type="hector_trajectory_server" name="trajectory_server_gt" ns="gt" >
-        <param name="/target_frame_name" value="prism" />
-        <param name="/source_frame_name" value="base_link" />
-        <param name="/trajectory_update_rate" value="10.0" />
-        <param name="/trajectory_publish_rate" value="10.0" />
-    </node>-->
-    <node pkg="hector_trajectory_server" type="hector_trajectory_server" name="trajectory_server_odom" ns="odom" >
-        <param name="/target_frame_name" value="map" />
-        <param name="/source_frame_name" value="odom" />
+    
+    <node pkg="hector_trajectory_server" type="hector_trajectory_server" name="trajectory_server_loam" ns="gt" >
+        <param name="/target_frame_name" value="world" />
+        <param name="/source_frame_name" value="velodyne" />
         <param name="/trajectory_update_rate" value="10.0" />
         <param name="/trajectory_publish_rate" value="10.0" />
     </node>
-    <node pkg="hector_trajectory_server" type="hector_trajectory_server" name="trajectory_server_map" ns="map" >
-        <param name="/target_frame_name" value="map" />
+    <node pkg="hector_trajectory_server" type="hector_trajectory_server" name="trajectory_server_loam" ns="odom_final" >
+        <param name="/target_frame_name" value="world" />
         <param name="/source_frame_name" value="odom_final" />
         <param name="/trajectory_update_rate" value="10.0" />
         <param name="/trajectory_publish_rate" value="10.0" />

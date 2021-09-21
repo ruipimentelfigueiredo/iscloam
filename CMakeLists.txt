@@ -83,23 +83,24 @@ target_link_libraries(iscloam_isc_generation_node ${EIGEN3_LIBRARIES} ${catkin_L
 add_dependencies(iscloam_isc_generation_node ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
 add_executable(iscloam_isc_optimization_node src/iscOptimizationNode.cpp src/iscOptimizationClass.cpp src/lidarOptimization.cpp src/lidar.cpp)
-target_link_libraries(iscloam_isc_optimization_node ${EIGEN3_LIBRARIES} ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${CERES_LIBRARIES} ${OpenCV_LIBRARIES} gtsam)
+target_link_libraries(iscloam_isc_optimization_node ${EIGEN3_LIBRARIES} ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${CERES_LIBRARIES} ${OpenCV_LIBRARIES}  gtsam)
 add_dependencies(iscloam_isc_optimization_node ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
 add_executable(iscloam_laser_mapping_node src/laserMappingNode.cpp src/laserMappingClass.cpp src/lidar.cpp)
 target_link_libraries(iscloam_laser_mapping_node ${EIGEN3_LIBRARIES} ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 
-install(TARGETS iscloam_laser_mapping_node iscloam_isc_optimization_node  iscloam_isc_generation_node iscloam_odom_estimation_node iscloam_laser_processing_node
+install(TARGETS iscloam_laser_processing_node iscloam_odom_estimation_node iscloam_isc_generation_node iscloam_isc_optimization_node iscloam_laser_mapping_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-install(DIRECTORY launch/
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+install(DIRECTORY rviz
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/ros/launch
 )
 
-install(DIRECTORY rviz/
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/rviz
+install(DIRECTORY launch
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/ros/launch
 )
+
 
