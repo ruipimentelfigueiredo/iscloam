@@ -56,6 +56,7 @@ void laser_processing(){
             pcl::PointCloud<pcl::PointXYZI>::Ptr pointcloud_in(new pcl::PointCloud<pcl::PointXYZI>());
             pcl::fromROSMsg(*pointCloudBuf.front(), *pointcloud_in);
             ros::Time pointcloud_time = (pointCloudBuf.front())->header.stamp;
+	    std::string pointcloud_frame_id = (pointCloudBuf.front())->header.frame_id;
             pointCloudBuf.pop();
             mutex_lock.unlock();
 
@@ -78,20 +79,20 @@ void laser_processing(){
             *pointcloud_filtered+=*pointcloud_surf;
             pcl::toROSMsg(*pointcloud_filtered, laserCloudFilteredMsg);
             laserCloudFilteredMsg.header.stamp = pointcloud_time;
-            laserCloudFilteredMsg.header.frame_id = "velodyne";
+            laserCloudFilteredMsg.header.frame_id = pointcloud_frame_id;
             pubLaserCloudFiltered.publish(laserCloudFilteredMsg);
 
             sensor_msgs::PointCloud2 edgePointsMsg;
             pcl::toROSMsg(*pointcloud_edge, edgePointsMsg);
             edgePointsMsg.header.stamp = pointcloud_time;
-            edgePointsMsg.header.frame_id = "velodyne";
+            edgePointsMsg.header.frame_id = pointcloud_frame_id;
             pubEdgePoints.publish(edgePointsMsg);
 
 
             sensor_msgs::PointCloud2 surfPointsMsg;
             pcl::toROSMsg(*pointcloud_surf, surfPointsMsg);
             surfPointsMsg.header.stamp = pointcloud_time;
-            surfPointsMsg.header.frame_id = "velodyne";
+            surfPointsMsg.header.frame_id = pointcloud_frame_id;
             pubSurfPoints.publish(surfPointsMsg);
 
         }
