@@ -82,6 +82,7 @@ void loop_closure_detection(){
             pcl::PointCloud<pcl::PointXYZI>::Ptr pointcloud_in(new pcl::PointCloud<pcl::PointXYZI>());
             pcl::fromROSMsg(*pointCloudBuf.front(), *pointcloud_in);
             ros::Time pointcloud_time = (pointCloudBuf.front())->header.stamp;
+            std::string pointcloud_frame_id = (pointCloudBuf.front())->header.frame_id;
             Eigen::Isometry3d odom_in = Eigen::Isometry3d::Identity();
             odom_in.rotate(Eigen::Quaterniond(odometryBuf.front()->pose.pose.orientation.w,odometryBuf.front()->pose.pose.orientation.x,odometryBuf.front()->pose.pose.orientation.y,odometryBuf.front()->pose.pose.orientation.z));  
             odom_in.pretranslate(Eigen::Vector3d(odometryBuf.front()->pose.pose.position.x,odometryBuf.front()->pose.pose.position.y,odometryBuf.front()->pose.pose.position.z));
@@ -93,7 +94,7 @@ void loop_closure_detection(){
             iscGeneration.loopDetection(pointcloud_in, odom_in);
 
             cv_bridge::CvImage out_msg;
-            out_msg.header.frame_id  = "velodyne"; 
+            out_msg.header.frame_id  = pointcloud_frame_id; 
             out_msg.header.stamp  = pointcloud_time; 
             out_msg.encoding = sensor_msgs::image_encodings::RGB8; 
             out_msg.image    = iscGeneration.getLastISCRGB(); 
@@ -101,7 +102,7 @@ void loop_closure_detection(){
             
             iscloam::LoopInfo loop;
             loop.header.stamp = pointcloud_time;
-            loop.header.frame_id = "velodyne";
+            loop.header.frame_id = pointcloud_frame_id;
             loop.current_id = iscGeneration.current_frame_id;
             for(int i=0;i<(int)iscGeneration.matched_frame_id.size();i++){
                 loop.matched_id.push_back(iscGeneration.matched_frame_id[i]);
